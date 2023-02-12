@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Build server file browser</title>
+</head>
+<body>
+
+<h1>{{ name }} file browser</h1>
+{% for file in files %}
+    <a href="{{file}}">{{file}}</a><br>
+{% endfor %}
+</body>
+</html>

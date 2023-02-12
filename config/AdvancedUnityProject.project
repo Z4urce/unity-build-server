@@ -1,0 +1,36 @@
+[
+    {
+        "buildDirectory": "/Build/Android",
+        "buildTarget": "Android",
+        "changelogUrl": "Slack/ Discord URL",
+        "env": "Development",
+        "name": "Dev",
+        "projectPath": "/Projects/AdvancedUnityProject_Dev_Android"
+    },
+    {
+        "buildDirectory": "/Build/iOS",
+        "buildTarget": "iOS",
+        "changelogUrl": "Slack/ Discord URL",
+        "env": "Development",
+        "name": "Dev iOS",
+        "projectPath": "/Projects/AdvancedUnityProject_Dev_iOS"
+    },
+    {
+        "buildDirectory": "/Build/Android",
+        "buildTarget": "Android",
+        "changelogUrl": "Slack/ Discord URL",
+        "engineVersion": "2019.2.19f1",
+        "env": "Production",
+        "name": "Prod",
+        "projectPath": "/Projects/AdvancedUnityProject_Prod_Android"
+    },
+    {
+        "buildDirectory": "/Build/Android",
+        "buildTarget": "iOS",
+        "changelogUrl": "Slack/ Discord URL",
+        "engineVersion": "2019.2.19f1",
+        "env": "Production",
+        "name": "Prod iOS",
+        "projectPath": "/Projects/AdvancedUnityProject_Prod_iOS"
+    }
+]

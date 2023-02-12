@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block content %}
+	<!-- Left Column -->
+    <div class="w3-third">
+
+      <div class="w3-white w3-text-grey w3-card-4">
+        <div class="w3-display-container">
+          <img src="{{ url_for('static',filename='header.jpg') }}" style="width:100%" alt="Avatar">
+          <div class="w3-display-bottomleft w3-container w3-text-black">
+            <h2>Unity Build Server</h2>
+          </div>
+        </div>
+        <div class="w3-container">
+		  {% for config in configs %}
+            {% if config['buildInProgress'] %}
+              <p><i class="fa fa-sign-in-alt fa-fw w3-margin-right w3-large w3-text-cyan"></i>Build {{config["name"]}}</p>
+            {% else %}
+              <p><i class="fa fa-sign-in-alt fa-fw w3-margin-right w3-large w3-text-cyan"></i><a href="/build/{{config['project'].replace(" ", "_")}}/{{config['name'].replace(" ", "_")}}" onclick="return confirm('Are you sure?')">Build {{config["name"]}}</a></p>
+            {% endif %}
+
+			<button id="changesetButton" onclick="window.couldRefresh = false; document.getElementById('{{config["name"]}}').style.display='block';" class="w3-button changeset-button">Changes since last build: {{config['newChanges']|length}}</button>
+			<div id="{{config["name"]}}" class="w3-modal">
+				<div class="w3-modal-content">
+					<div class="w3-container">
+						<span id="closeChangesButton" onclick="window.couldRefresh = true; document.getElementById('{{config["name"]}}').style.display='none';" class="w3-button changeset-close w3-display-topright">&times;</span>
+						<p>Changes since last {{config["name"]}} build:</p>
+						<span class="w3-text">
+							<ul>
+							{% for change in config['newChanges'] %}
+							<li>{{change}}</li>
+							{% endfor %}
+							</ul>
+						</span>
+					</div>
+				</div>
+			</div>
+		  {% endfor %}
+
+          <hr>
+        </div>
+      </div><br>
+
+    <!-- End Left Column -->
+    </div>
+
+    <!-- Center Column -->
+    <div class="w3-third">
+
+      <div class="w3-container w3-card w3-white w3-margin-bottom">
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-database fa-fw w3-margin-right w3-xxlarge w3-text-cyan"></i>History</h2>
+
+		{% for build in builds %}
+		<div class="w3-container">
+          <h5 class="w3-opacity"><b><a href="/log/{{build[3]}}" target="_blank">{{build[3].replace("_", " ")}}</a></b></h5>
+          <h6 class="w3-text-cyan"><i class="fa fa-calendar-alt fa-fw w3-margin-right"></i>{{build[4].split(".")[0]}}</h6>
+
+            {% for config in configs if ((config['lastBuildId'] == build[0]) and (config['buildInProgress'])) %}
+               <h6 class="w3-text-cyan"><i class="fa fa-spinner fa-spin fa-fw w3-margin-right"></i>Build in progress</h6>
+               <h6 class="w3-text-cyan"><i class="fa fa-stop-circle fa-fw w3-margin-right"></i><a href="/stop/{{config['project'].replace(" ", "_")}}/{{config['name'].replace(" ", "_")}}" onclick="return confirm('Are you sure?')">Cancel build</a></h6>
+            {% else %}
+                {% if build[9] == 'failed' %}
+                    <h6 class="w3-text-red"><i class="fa fa-info-circle fa-fw w3-margin-right"></i>State: {{build[9]}}</h6>
+				{% elif build[9] == 'unknown' %}
+					<h6 class="w3-text-purple"><i class="fa fa-info-circle fa-fw w3-margin-right"></i>State: {{build[9]}}</h6>
+                {% else %}
+                   <h6 class="w3-text-cyan"><i class="fa fa-info-circle fa-fw w3-margin-right"></i>State: {{build[9]}}</h6>
+                {% endif %}
+
+                {% if build[8] != '' %}
+                    <h6 class="w3-text-cyan"><i class="fa fa-hourglass-end fa-fw w3-margin-right"></i>Duration: {{build[8].split(".")[0]}}</h6>
+                {% endif %}
+            {% endfor %}
+			
+		  <h6 class="w3-text-cyan"><i class="fa fa-list fa-fw w3-margin-right"></i><a href="/changelog/{{build[1].replace(" ", "_")}}/{{build[0]}}">Change Log</a></h6>
+          <hr>
+        </div>
+       {% endfor %}
+
+      </div>
+
+    <!-- End Center Column -->
+	</div>
+	
+	<!-- Builds Column -->
+    <div class="w3-third">
+		<div class="w3-container w3-card w3-white w3-margin-bottom">
+              
+			  <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-spinner fa-fw w3-margin-right w3-xxlarge w3-text-cyan"></i>Build Progress</h2>
+
+			  {% set builds = {'running': False} %}
+			  
+              {% for config in configs %}
+                {% if config['buildInProgress'] %}
+				  {% if builds.update({'running': True}) %} {% endif %}
+				  
+                  <p>{{config["name"]}}</p>
+                  <div class="w3-light-grey w3-round-xlarge w3-small">
+                    <div class="w3-container w3-center w3-round-xlarge w3-{{config["progressColor"]}}" style="width:{{config["progress"]}}%">{{config["progress"]}}%</div>
+                  </div>
+
+                {% endif %}
+              {% endfor %}
+			  
+			  {% if not builds["running"] %}
+			  <p class="w3-text"><i class="w3-margin-right"></i>No build in progress</p>
+			  {% endif %}
+			  
+			<br>
+		</div>
+	<!-- End Builds Column -->
+    </div>
+	
+{% endblock %}

@@ -1,0 +1,22 @@
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<style>
+    .highlight {color:red;}
+</style>
+<pre id="text">
+    {{ text }}
+</pre>
+<script>
+    $(document).ready(function () {
+        var t = $("#text").html();
+        var wordsToHighlight = ["DisplayProgressbar:", "DisplayProgressNotification:", "failed", "Failed", "FAILURE", "Exception", "Error", "error"];
+
+        for (i = 0; i < wordsToHighlight.length; i++) {
+             t = t.split(wordsToHighlight[i]).join("<span class='highlight'><b>"+wordsToHighlight[i]+"</b></span>");
+            }
+
+
+        $("#text").html(t);
+    });
+</script>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<title>Unity Build Server</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{ url_for('static',filename='w3.css') }}">
+<link rel='stylesheet' href="{{ url_for('static',filename='roboto.css') }}">
+<!-- <link rel="stylesheet" href="{{ url_for('static',filename='font-awesome.min.css') }}">-->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif}
+</style>
+<body class="w3-light-grey">
+
+<script type="text/javascript">
+    let couldRefresh = true;
+
+    setInterval(function () {
+        if (couldRefresh === true) {
+            $.get("", function (r) {
+                let page = $(r).filter("#page").html();
+                $("#page").html(page);
+            });
+        }
+    }, 10000);
+    $('.changeset-button').on('click', function() {
+        couldRefresh = false;
+    });
+    $('.changeset-close').on('click', function() {
+        couldRefresh = true;
+    });
+
+</script>
+
+<!-- Page Container -->
+<div class="w3-content w3-margin-top" style="max-width:1400px;" id="page">
+
+  <!-- The Grid -->
+  <div class="w3-row-padding">
+  
+    <!-- Left Column -->
+    <div class="w3-third">
+    
+      <div class="w3-white w3-text-grey w3-card-4">
+        <div class="w3-display-container">
+          <img src="{{ url_for('static',filename='header.jpg') }}" style="width:100%" alt="Avatar">
+          <div class="w3-display-bottomleft w3-container w3-text-black">
+            <h2>Unity Build Server</h2>
+          </div>
+        </div>
+        <div class="w3-container">
+		  {% for config in configs %}
+            {% if config['build_in_progress'] %}
+              <p><i class="fa fa-sign-in-alt fa-fw w3-margin-right w3-large w3-text-cyan"></i>Build {{config["name"]}}</p>
+            {% else %}
+              <p><i class="fa fa-sign-in-alt fa-fw w3-margin-right w3-large w3-text-cyan"></i><a href="/build/{{config['project'].replace(" ", "_")}}/{{config['name'].replace(" ", "_")}}" onclick="return confirm('Are you sure?')">Build {{config["name"]}}</a></p>
+            {% endif %}
+			
+			<button onclick="document.getElementById('{{config["name"]}}').style.display='block'" class="w3-button changeset-button">Changes since last build: {{config['newChanges']|length}}</button>
+			<div id="{{config["name"]}}" class="w3-modal">
+				<div class="w3-modal-content">
+					<div class="w3-container">
+						<span onclick="document.getElementById('{{config["name"]}}').style.display='none'" class="w3-button changeset-close w3-display-topright">&times;</span>
+						<p>Changes since last {{config["name"]}} build:</p>
+						<span class="w3-text">
+							<ul>
+							{% for change in config['newChanges'] %}
+							<li>{{change}}</li>
+							{% endfor %}
+							</ul>
+						</span>
+					</div>
+				</div>
+			</div>
+			
+			
+		  {% endfor %}
+          <hr>
+              <p class="w3-large"><b><i class="fa fa-spinner fa-fw w3-margin-right w3-text-cyan"></i>Build Progress</b></p>
+
+              {% for config in configs %}
+                {% if config['build_in_progress'] %}
+                  <p>{{config["name"]}}</p>
+                  <div class="w3-light-grey w3-round-xlarge w3-small">
+                    <div class="w3-container w3-center w3-round-xlarge w3-{{config["progressColor"]}}" style="width:{{config["progress"]}}%">{{config["progress"]}}%</div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+          <br>
+        </div>
+      </div><br>
+
+    <!-- End Left Column -->
+    </div>
+
+    <!-- Right Column -->
+    <div class="w3-twothird">
+    
+      <div class="w3-container w3-card w3-white w3-margin-bottom">
+        <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-database fa-fw w3-margin-right w3-xxlarge w3-text-cyan"></i>History</h2>
+        
+		{% for build in builds %}
+		<div class="w3-container">
+          <h5 class="w3-opacity"><b>{{build[3]}}</b></h5>
+          <h6 class="w3-text-cyan"><i class="fa fa-calendar-alt fa-fw w3-margin-right"></i>{{build[4].split(".")[0]}}</h6>
+		  <p><a href="/log/{{build[3]}}">Build log</a></p>
+          <hr>
+        </div>
+       {% endfor %}
+		
+      </div>
+
+    <!-- End Right Column -->
+    </div>
+    
+  <!-- End Grid -->
+  </div>
+  
+  <!-- End Page Container -->
+</div>
+
+<footer class="w3-container w3-cyan w3-center w3-margin-top">
+  <p>Z4urce - 2018</p><br>
+</footer>
+
+</body>
+</html>
